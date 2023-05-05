@@ -1,9 +1,16 @@
 package me.xu.spring.context;
 
-import me.xu.spring.bean.BeanDefinition;
+import me.xu.spring.beans.BeanDefinition;
+import me.xu.spring.beans.BeanFactory;
+import me.xu.spring.beans.SimpleBeanFactory;
+import me.xu.spring.beans.XmlBeanDefinitionReader;
+import me.xu.spring.core.ClassPathXmlResource;
+import me.xu.spring.core.Resource;
+import me.xu.spring.exception.BeansException;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.springframework.beans.factory.parsing.BeanEntry;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -18,58 +25,27 @@ import java.util.Map;
  *
  * @author Wen
  */
-public class ClassPathXmlApplicationContext {
+public class ClassPathXmlApplicationContext implements BeanFactory {
 
-    /**
-     * Bean集合
-     */
-    private List<BeanDefinition> beanDefinitions = new ArrayList<>();
-
-    /**
-     * Bean的单例
-     */
-    private Map<String, Object> singletons = new HashMap<>();
+    BeanFactory beanFactory;
 
     public ClassPathXmlApplicationContext(String fileName) {
-        this.readXml(fileName);
-        this.instanceBeans();
+        // 获取资源
+        Resource resource = new ClassPathXmlResource(fileName);
+        // 解析资源
+        BeanFactory beanFactory = new SimpleBeanFactory();
+        XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(beanFactory);
+        reader.loadBeanDefinitions(resource);
+        this.beanFactory = beanFactory;
     }
 
-    /**
-     * 解析XML，获取Bean实例，放入Bean集合中
-     */
-    private void readXml(String fileName) {
-        SAXReader saxReader = new SAXReader();
-        try {
-            URL xmlPath = this.getClass().getClassLoader().getResource(fileName);
-            Document document = saxReader.read(xmlPath);
-            Element rootElement = document.getRootElement();
-            // 对配置文件中每一个Bean进行处理
-            for (Element element : (List<Element>) rootElement.elements()) {
-                String beanID = element.attributeValue("id");
-                String beanClassName = element.attributeValue("class");
-                BeanDefinition beanDefinition = new BeanDefinition(beanID, beanClassName);
-                beanDefinitions.add(beanDefinition);
-
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    @Override
+    public Object getBean(String beanName) throws BeansException {
+        return beanFactory.getBean(beanName);
     }
 
-    private void instanceBeans() {
-        for (BeanDefinition beanDefinition : beanDefinitions) {
-            try {
-                // 反射创建Bean实例放入单例中
-                singletons.put(beanDefinition.getId(), Class.forName(beanDefinition.getClassName()).newInstance());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
+    @Override
+    public void registerBeanDefinition(BeanDefinition beanDefinition) {
+        beanFactory.registerBeanDefinition(beanDefinition);
     }
-
-    public Object getBean(String beanName) {
-        return singletons.get(beanName);
-    }
-
 }

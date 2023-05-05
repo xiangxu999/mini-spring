@@ -1,4 +1,4 @@
-package me.xu.spring.bean;
+package me.xu.spring.beans;
 
 /**
  * Description Bean定义（最简单的id和class）

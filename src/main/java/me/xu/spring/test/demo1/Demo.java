@@ -1,6 +1,7 @@
 package me.xu.spring.test.demo1;
 
 import me.xu.spring.context.ClassPathXmlApplicationContext;
+import me.xu.spring.exception.BeansException;
 
 /**
  * Description 案例测试01
@@ -10,7 +11,7 @@ import me.xu.spring.context.ClassPathXmlApplicationContext;
  * @author Wen
  */
 public class Demo {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws BeansException {
         ClassPathXmlApplicationContext classPathXmlApplicationContext = new ClassPathXmlApplicationContext("demo.xml");
         DemoService demoService = (DemoService)classPathXmlApplicationContext.getBean("DemoService");
         demoService.test();
