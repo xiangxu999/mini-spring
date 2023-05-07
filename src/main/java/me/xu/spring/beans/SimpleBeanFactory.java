@@ -2,6 +2,8 @@ package me.xu.spring.beans;
 
 import me.xu.spring.exception.BeansException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,16 +14,14 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Wen
  */
-public class SimpleBeanFactory extends DefaultSingletonBeanRegistry implements BeanFactory {
+public class SimpleBeanFactory extends DefaultSingletonBeanRegistry implements BeanFactory, BeanDefinitionRegistry {
 
     private Map<String, BeanDefinition> beanDefinitions = new ConcurrentHashMap<>(256);
 
+    private List<String> beanDefinitionNames = new ArrayList<>();
+
     public SimpleBeanFactory() {
 
-    }
-
-    public void registerBeanDefinition(BeanDefinition beanDefinition) {
-        beanDefinitions.put(beanDefinition.getId(), beanDefinition);
     }
 
     @Override
@@ -55,5 +55,50 @@ public class SimpleBeanFactory extends DefaultSingletonBeanRegistry implements B
     @Override
     public void registerBean(String beanName, Object obj) {
         registerSingleton(beanName, obj);
+    }
+
+    @Override
+    public boolean isSingleton(String name) {
+        return beanDefinitions.get(name).isSingleton();
+    }
+
+    @Override
+    public boolean isPrototype(String name) {
+        return beanDefinitions.get(name).isPrototype();
+    }
+
+    @Override
+    public Class getType(String name) {
+        return beanDefinitions.get(name).getClass();
+    }
+
+    @Override
+    public void registerBeanDefinition(String name, BeanDefinition beanDefinition) {
+        beanDefinitions.put(name, beanDefinition);
+        beanDefinitionNames.add(name);
+        if (!beanDefinition.isLazyInit()) {
+            try {
+                getBean(name);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void removeBeanDefinition(String name) {
+        beanDefinitions.remove(name);
+        beanDefinitionNames.remove(name);
+        removeSingleton(name);
+    }
+
+    @Override
+    public BeanDefinition getBeanDefinition(String name) {
+        return beanDefinitions.get(name);
+    }
+
+    @Override
+    public boolean containsBeanDefinition(String name) {
+        return beanDefinitions.containsKey(name);
     }
 }

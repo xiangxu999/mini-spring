@@ -32,4 +32,20 @@ public interface BeanFactory {
      * @param obj Bean对象
      */
     void registerBean(String beanName, Object obj);
+
+    /**
+     * 判断是否为单例
+     * @param name 别名
+     * @return
+     */
+    boolean isSingleton(String name);
+
+    /**
+     * 判断是否为原型
+     * @param name 别名
+     * @return
+     */
+    boolean isPrototype(String name);
+
+    Class getType(String name);
 }
