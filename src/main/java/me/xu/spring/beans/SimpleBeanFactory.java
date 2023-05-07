@@ -2,10 +2,8 @@ package me.xu.spring.beans;
 
 import me.xu.spring.exception.BeansException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Description Bean工厂具体实现
@@ -14,58 +12,48 @@ import java.util.Map;
  *
  * @author Wen
  */
-public class SimpleBeanFactory implements BeanFactory {
+public class SimpleBeanFactory extends DefaultSingletonBeanRegistry implements BeanFactory {
 
-    /**
-     * Bean定义集合
-     */
-    private List<BeanDefinition> beanDefinitions = new ArrayList<>();
-
-    /**
-     * Bean的id集合
-     */
-    private List<String> beanNames = new ArrayList<>();
-
-    /**
-     * Bean单例集合
-     */
-    private Map<String, Object> singletons = new HashMap<>();
+    private Map<String, BeanDefinition> beanDefinitions = new ConcurrentHashMap<>(256);
 
     public SimpleBeanFactory() {
 
     }
 
+    public void registerBeanDefinition(BeanDefinition beanDefinition) {
+        beanDefinitions.put(beanDefinition.getId(), beanDefinition);
+    }
 
     @Override
     public Object getBean(String beanName) throws BeansException {
-        // 先尝试从单例集合中获取
-        Object singleton = singletons.get(beanName);
+        // 先尝试直接单例获取
+        Object singleton = getSingleton(beanName);
         // 如果没有，开始实例化Bean
         if (singleton == null) {
-            // 序号
-            int i = beanNames.indexOf(beanName);
-            if (i == -1) {
-                throw new BeansException("BeanName错误");
-            } else {
-                // 获取Bean定义对象
-                BeanDefinition beanDefinition = beanDefinitions.get(i);
-                try {
-                    // 反射创建Bean对象
-                    singleton = Class.forName(beanDefinition.getClassName()).newInstance();
-                    // 注册Bean实例
-                    singletons.put(beanDefinition.getId(), singleton);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
+            // 获取Bean定义
+            BeanDefinition beanDefinition = beanDefinitions.get(beanName);
+            if (beanDefinition == null) {
+                throw new BeansException("错误Bean id");
+            }
+            try {
+                // 反射实例化Bean
+                singleton = Class.forName(beanDefinition.getClassName()).newInstance();
+                // 注册单例Bean
+                registerSingleton(beanName, singleton);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         return singleton;
     }
 
     @Override
-    public void registerBeanDefinition(BeanDefinition beanDefinition) {
-        beanDefinitions.add(beanDefinition);
-        beanNames.add(beanDefinition.getId());
+    public Boolean containsBean(String name) {
+        return containsSingleton(name);
+    }
+
+    @Override
+    public void registerBean(String beanName, Object obj) {
+        registerSingleton(beanName, obj);
     }
 }
