@@ -1,22 +1,11 @@
 package me.xu.spring.context;
 
-import me.xu.spring.beans.BeanDefinition;
 import me.xu.spring.beans.BeanFactory;
 import me.xu.spring.beans.SimpleBeanFactory;
 import me.xu.spring.beans.XmlBeanDefinitionReader;
 import me.xu.spring.core.ClassPathXmlResource;
 import me.xu.spring.core.Resource;
 import me.xu.spring.exception.BeansException;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
-import org.springframework.beans.factory.parsing.BeanEntry;
-
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Description 解析XML构建上下文
@@ -27,25 +16,30 @@ import java.util.Map;
  */
 public class ClassPathXmlApplicationContext implements BeanFactory {
 
-    BeanFactory beanFactory;
+    SimpleBeanFactory simpleBeanFactory;
 
     public ClassPathXmlApplicationContext(String fileName) {
         // 获取资源
         Resource resource = new ClassPathXmlResource(fileName);
         // 解析资源
-        BeanFactory beanFactory = new SimpleBeanFactory();
+        SimpleBeanFactory beanFactory = new SimpleBeanFactory();
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(beanFactory);
         reader.loadBeanDefinitions(resource);
-        this.beanFactory = beanFactory;
+        this.simpleBeanFactory = beanFactory;
     }
 
     @Override
     public Object getBean(String beanName) throws BeansException {
-        return beanFactory.getBean(beanName);
+        return simpleBeanFactory.getBean(beanName);
     }
 
     @Override
-    public void registerBeanDefinition(BeanDefinition beanDefinition) {
-        beanFactory.registerBeanDefinition(beanDefinition);
+    public Boolean containsBean(String name) {
+        return simpleBeanFactory.containsBean(name);
+    }
+
+    @Override
+    public void registerBean(String beanName, Object obj) {
+        simpleBeanFactory.registerBean(beanName, obj);
     }
 }

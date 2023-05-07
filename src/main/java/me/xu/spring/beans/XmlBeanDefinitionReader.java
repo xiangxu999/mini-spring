@@ -12,14 +12,13 @@ import org.dom4j.Element;
  */
 public class XmlBeanDefinitionReader {
 
-    BeanFactory beanFactory;
+    SimpleBeanFactory simpleBeanFactory;
 
     /**
      * 构造函数
-     * @param beanFactory bean工厂
      */
-    public XmlBeanDefinitionReader(BeanFactory beanFactory) {
-        this.beanFactory = beanFactory;
+    public XmlBeanDefinitionReader(SimpleBeanFactory simpleBeanFactory) {
+        this.simpleBeanFactory = simpleBeanFactory;
     }
 
     /**
@@ -32,7 +31,7 @@ public class XmlBeanDefinitionReader {
             String beanID = element.attributeValue("id");
             String beanClassName = element.attributeValue("class");
             BeanDefinition beanDefinition = new BeanDefinition(beanID, beanClassName);
-            beanFactory.registerBeanDefinition(beanDefinition);
+            simpleBeanFactory.registerBeanDefinition(beanDefinition);
         }
     }
 
