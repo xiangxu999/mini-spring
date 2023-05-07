@@ -21,9 +21,15 @@ public interface BeanFactory {
     Object getBean(String beanName) throws BeansException;
 
     /**
-     * 注册BeanDefinition
-     *
-     * @param beanDefinition Bean定义对象
+     * 是否包含某个Bean
+     * @param name Bean id
      */
-    void registerBeanDefinition(BeanDefinition beanDefinition);
+    Boolean containsBean(String name);
+
+    /**
+     * 注册单例Bean
+     * @param beanName Bean id
+     * @param obj Bean对象
+     */
+    void registerBean(String beanName, Object obj);
 }
