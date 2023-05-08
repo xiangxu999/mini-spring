@@ -38,7 +38,7 @@ public class BeanDefinition {
     /**
      * 是否在加载时候初始化
      */
-    private boolean lazyInit = false;
+    private boolean lazyInit = true;
 
     /**
      * 记录Bean之间依赖关系
