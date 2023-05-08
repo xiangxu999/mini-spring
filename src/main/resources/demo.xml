@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <beans>
-    <bean id = "DemoService" class = "me.xu.spring.test.demo1.DemoServiceImpl"></bean>
+    <bean id = "DemoService" class = "me.xu.spring.test.demo01.DemoServiceImpl"></bean>
+    <bean id = "AService" class="me.xu.spring.test.demo02.AServiceImpl">
+        <property name="content" type="String" value="hello A"/>
+    </bean>
+    <bean id = "BService" class="me.xu.spring.test.demo02.BServiceImpl">
+        <constructor-arg name="content" type="String" value="hello b"/>
+        <constructor-arg name="type"  type="int" value="1"/>
+    </bean>
 </beans>
