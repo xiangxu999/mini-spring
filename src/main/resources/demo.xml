@@ -7,5 +7,6 @@
     <bean id = "BService" class="me.xu.spring.test.demo02.BServiceImpl">
         <constructor-arg name="content" type="String" value="hello b"/>
         <constructor-arg name="type"  type="int" value="1"/>
+        <property name="aService" type="me.xu.spring.test.demo02.AServiceImpl" ref="AService"></property>
     </bean>
 </beans>
