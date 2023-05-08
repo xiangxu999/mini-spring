@@ -106,6 +106,13 @@ public class SimpleBeanFactory extends DefaultSingletonBeanRegistry implements B
             }
         }
 
+        // 处理配置参数
+        handleProperty(beanDefinition, clz, obj);
+
+        return obj;
+    }
+
+    private void handleProperty(BeanDefinition beanDefinition, Class<?> clz, Object obj) {
         // 处理属性
         PropertyValues propertyValues = beanDefinition.getPropertyValues();
         if (!propertyValues.isEmpty()) {
@@ -115,20 +122,36 @@ public class SimpleBeanFactory extends DefaultSingletonBeanRegistry implements B
                 String pName = propertyValue.getName();
                 String pType = propertyValue.getType();
                 Object pValue = propertyValue.getValue();
+                boolean isRef = propertyValue.isRef();
 
                 Class<?>[] paramTypes = new Class<?>[1];
-                if ("String".equals(pType) || "java.lang.String".equals(pType)) {
-                    paramTypes[0] = String.class;
-                } else if ("Integer".equals(pType) || "java.lang.Integer".equals(pType)) {
-                    paramTypes[0] = Integer.class;
-                } else if ("int".equals(pType)) {
-                    paramTypes[0] = int.class;
+                Object[] paramValues = new Object[1];
+
+                // 如果是基本类型
+                if (!isRef) {
+                    // 参数类型处理
+                    if ("String".equals(pType) || "java.lang.String".equals(pType)) {
+                        paramTypes[0] = String.class;
+                    } else if ("Integer".equals(pType) || "java.lang.Integer".equals(pType)) {
+                        paramTypes[0] = Integer.class;
+                    } else if ("int".equals(pType)) {
+                        paramTypes[0] = int.class;
+                    } else {
+                        paramTypes[0] = String.class;
+                    }
+                    // 参数具体数值
+                    paramValues[0] = pValue;
                 } else {
-                    paramTypes[0] = String.class;
+                    // 如果是引用类型
+                    try {
+                        paramTypes[0] = Class.forName(pType);
+                        // 再次调用getBean方法
+                        paramValues[0] = getBean((String)pValue);
+                    } catch (ClassNotFoundException | BeansException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
 
-                Object[] paramValues = new Object[1];
-                paramValues[0] = pValue;
 
                 // 方法名字
                 String methodName = "set" + pName.substring(0, 1).toUpperCase() + pName.substring(1);
@@ -155,10 +178,7 @@ public class SimpleBeanFactory extends DefaultSingletonBeanRegistry implements B
 
             }
         }
-
-        return obj;
     }
-
 
 
     @Override
