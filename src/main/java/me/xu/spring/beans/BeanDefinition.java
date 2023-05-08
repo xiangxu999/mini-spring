@@ -46,6 +46,16 @@ public class BeanDefinition {
     private String[] dependsOn;
 
     /**
+     * 构造函数配置类
+     */
+    private ArgumentValues constructorArgumentValues;
+
+    /**
+     * 属性配置类
+     */
+    private PropertyValues propertyValues;
+
+    /**
      * 初始方法声明
      */
     private String initMethodName;
@@ -115,25 +125,25 @@ public class BeanDefinition {
         return this.dependsOn;
     }
 
-    //public void setConstructorArgumentValues(ArgumentValues constructorArgumentValues) {
-    //    this.constructorArgumentValues =
-    //            (constructorArgumentValues != null ? constructorArgumentValues : new ArgumentValues());
-    //}
-    //
-    //public ArgumentValues getConstructorArgumentValues() {
-    //    return this.constructorArgumentValues;
-    //}
-    //
-    //public boolean hasConstructorArgumentValues() {
-    //    return !this.constructorArgumentValues.isEmpty();
-    //}
-    //public void setPropertyValues(PropertyValues propertyValues) {
-    //    this.propertyValues = (propertyValues != null ? propertyValues : new PropertyValues());
-    //}
-    //
-    //public PropertyValues getPropertyValues() {
-    //    return this.propertyValues;
-    //}
+    public void setConstructorArgumentValues(ArgumentValues constructorArgumentValues) {
+        this.constructorArgumentValues =
+                (constructorArgumentValues != null ? constructorArgumentValues : new ArgumentValues());
+    }
+
+    public ArgumentValues getConstructorArgumentValues() {
+        return this.constructorArgumentValues;
+    }
+
+    public boolean hasConstructorArgumentValues() {
+        return !this.constructorArgumentValues.isEmpty();
+    }
+    public void setPropertyValues(PropertyValues propertyValues) {
+        this.propertyValues = (propertyValues != null ? propertyValues : new PropertyValues());
+    }
+
+    public PropertyValues getPropertyValues() {
+        return this.propertyValues;
+    }
     public void setInitMethodName(String initMethodName) {
         this.initMethodName = initMethodName;
     }
