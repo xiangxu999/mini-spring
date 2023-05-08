@@ -19,6 +19,10 @@ public class ClassPathXmlApplicationContext implements BeanFactory {
     SimpleBeanFactory simpleBeanFactory;
 
     public ClassPathXmlApplicationContext(String fileName) {
+        this(fileName, false);
+    }
+
+    public ClassPathXmlApplicationContext(String fileName, boolean isRefresh) {
         // 获取资源
         Resource resource = new ClassPathXmlResource(fileName);
         // 解析资源
@@ -26,6 +30,9 @@ public class ClassPathXmlApplicationContext implements BeanFactory {
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(beanFactory);
         reader.loadBeanDefinitions(resource);
         this.simpleBeanFactory = beanFactory;
+        if (!isRefresh) {
+            beanFactory.refresh();
+        }
     }
 
     @Override

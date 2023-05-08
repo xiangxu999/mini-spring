@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,8 +24,23 @@ public class SimpleBeanFactory extends DefaultSingletonBeanRegistry implements B
 
     private List<String> beanDefinitionNames = new ArrayList<>();
 
+    /**
+     * Bean半成品
+     */
+    private final Map<String, Object> earlySingletonObjects = new HashMap<String, Object>(16);
+
     public SimpleBeanFactory() {
 
+    }
+
+    public void refresh() {
+        for (String beanName : beanDefinitionNames) {
+            try {
+                getBean(beanName);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -33,18 +49,20 @@ public class SimpleBeanFactory extends DefaultSingletonBeanRegistry implements B
         Object singleton = getSingleton(beanName);
         // 如果没有，开始实例化Bean
         if (singleton == null) {
-            // 获取Bean定义
-            BeanDefinition beanDefinition = beanDefinitions.get(beanName);
-            if (beanDefinition == null) {
-                throw new BeansException("错误Bean id");
-            }
-            try {
-                // 反射实例化Bean
-                singleton = createBean(beanDefinition);
-                // 注册单例Bean
-                registerSingleton(beanName, singleton);
-            } catch (Exception e) {
-                e.printStackTrace();
+            // 尝试从Bean半成品中获取
+            singleton = earlySingletonObjects.get(beanName);
+            if (singleton == null) {
+                // 如果半成品也没有，创建Bean实例并注册
+                // 获取Bean定义
+                BeanDefinition beanDefinition = beanDefinitions.get(beanName);
+                try {
+                    // 反射实例化Bean
+                    singleton = createBean(beanDefinition);
+                    // 注册单例Bean
+                    registerSingleton(beanName, singleton);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         return singleton;
@@ -53,17 +71,31 @@ public class SimpleBeanFactory extends DefaultSingletonBeanRegistry implements B
     private Object createBean(BeanDefinition beanDefinition) {
         // 类名
         Class<?> clz = null;
-        Object obj = null;
-        // 构造函数
-        Constructor<?> constructor = null;
-
+        // 创建半成品Bean
+        Object obj = doCreateBean(beanDefinition);
+        // 放入半成品Bean集合中
+        earlySingletonObjects.put(beanDefinition.getId(), obj);
         try {
             // 反射获取类名
             clz = Class.forName(beanDefinition.getClassName());
         } catch (Exception e) {
             e.printStackTrace();
         }
+        // 处理配置参数（属性注入）
+        handleProperty(beanDefinition, clz, obj);
+        return obj;
+    }
 
+    private Object doCreateBean(BeanDefinition beanDefinition) {
+        Class clz = null;
+        Object obj = null;
+        Constructor constructor = null;
+
+        try {
+            clz = Class.forName(beanDefinition.getClassName());
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         // 处理构造器参数
         ArgumentValues argumentValues = beanDefinition.getConstructorArgumentValues();
         if (!argumentValues.isEmpty()) {
@@ -105,10 +137,6 @@ public class SimpleBeanFactory extends DefaultSingletonBeanRegistry implements B
                 throw new RuntimeException(e);
             }
         }
-
-        // 处理配置参数
-        handleProperty(beanDefinition, clz, obj);
-
         return obj;
     }
 
@@ -151,7 +179,6 @@ public class SimpleBeanFactory extends DefaultSingletonBeanRegistry implements B
                         throw new RuntimeException(e);
                     }
                 }
-
 
                 // 方法名字
                 String methodName = "set" + pName.substring(0, 1).toUpperCase() + pName.substring(1);
