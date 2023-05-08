@@ -11,6 +11,8 @@ public class AServiceImpl implements AService {
 
     private String content;
 
+    private BService bService;
+
     @Override
     public void A() {
         System.out.println(content);
@@ -22,5 +24,9 @@ public class AServiceImpl implements AService {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public void setBService(BServiceImpl bService) {
+        this.bService = bService;
     }
 }
