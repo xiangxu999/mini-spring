@@ -36,6 +36,19 @@ public class XmlBeanDefinitionReader {
             BeanDefinition beanDefinition = new BeanDefinition(beanID, beanClassName);
             // 解析动作开始
 
+            // 处理构造器参数
+            List<Element> constrElements = element.elements("constructor-arg");
+            ArgumentValues argumentValues = new ArgumentValues();
+            for (Element e : constrElements) {
+                // 获取属性
+                String name = e.attributeValue("name");
+                String type = e.attributeValue("type");
+                String value = e.attributeValue("value");
+                // 添加到构造器参数集合中
+                argumentValues.addArgumentValue(new ArgumentValue(type, name, value));
+            }
+            beanDefinition.setConstructorArgumentValues(argumentValues);
+
             // 处理属性
             List<Element> propertyElements = element.elements("property");
             PropertyValues propertyValues = new PropertyValues();
@@ -66,19 +79,6 @@ public class XmlBeanDefinitionReader {
             String[] refArray = refs.toArray(new String[0]);
             // 设置依赖集合
             beanDefinition.setDependsOn(refArray);
-
-            // 处理构造器参数
-            List<Element> constrElements = element.elements("constructor-arg");
-            ArgumentValues argumentValues = new ArgumentValues();
-            for (Element e : constrElements) {
-                // 获取属性
-                String name = e.attributeValue("name");
-                String type = e.attributeValue("type");
-                String value = e.attributeValue("value");
-                // 添加到构造器参数集合中
-                argumentValues.addArgumentValue(new ArgumentValue(type, name, value));
-            }
-            beanDefinition.setConstructorArgumentValues(argumentValues);
 
             simpleBeanFactory.registerBeanDefinition(beanID, beanDefinition);
         }
