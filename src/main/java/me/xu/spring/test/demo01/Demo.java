@@ -1,4 +1,4 @@
-package me.xu.spring.test.demo1;
+package me.xu.spring.test.demo01;
 
 import me.xu.spring.context.ClassPathXmlApplicationContext;
 import me.xu.spring.exception.BeansException;

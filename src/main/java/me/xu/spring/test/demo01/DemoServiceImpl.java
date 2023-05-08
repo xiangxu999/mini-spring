@@ -1,4 +1,4 @@
-package me.xu.spring.test.demo1;
+package me.xu.spring.test.demo01;
 
 /**
  * Description 案例测试01具体实现
