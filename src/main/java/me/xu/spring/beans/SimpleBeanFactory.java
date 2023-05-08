@@ -2,6 +2,9 @@ package me.xu.spring.beans;
 
 import me.xu.spring.exception.BeansException;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +40,7 @@ public class SimpleBeanFactory extends DefaultSingletonBeanRegistry implements B
             }
             try {
                 // 反射实例化Bean
-                singleton = Class.forName(beanDefinition.getClassName()).newInstance();
+                singleton = createBean(beanDefinition);
                 // 注册单例Bean
                 registerSingleton(beanName, singleton);
             } catch (Exception e) {
@@ -46,6 +49,117 @@ public class SimpleBeanFactory extends DefaultSingletonBeanRegistry implements B
         }
         return singleton;
     }
+
+    private Object createBean(BeanDefinition beanDefinition) {
+        // 类名
+        Class<?> clz = null;
+        Object obj = null;
+        // 构造函数
+        Constructor<?> constructor = null;
+
+        try {
+            // 反射获取类名
+            clz = Class.forName(beanDefinition.getClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 处理构造器参数
+        ArgumentValues argumentValues = beanDefinition.getConstructorArgumentValues();
+        if (!argumentValues.isEmpty()) {
+            // 参数类型
+            Class<?>[] paramTypes = new Class<?>[argumentValues.getArgumentCount()];
+            // 参数值
+            Object[] paramValues = new Object[argumentValues.getArgumentCount()];
+            // 遍历构造器参数集合
+            for (int i = 0; i < argumentValues.getArgumentCount(); i++) {
+                ArgumentValue argumentValue = argumentValues.getIndexedArgumentValue(i);
+                if ("String".equals(argumentValue.getType()) || "java.lang.String".equals(argumentValue.getType())) {
+                    paramTypes[i] = String.class;
+                    paramValues[i] = argumentValue.getValue();
+                } else if ("Integer".equals(argumentValue.getType()) || "java.lang.Integer".equals(argumentValue.getType())) {
+                    paramTypes[i] = Integer.class;
+                    paramValues[i] = Integer.valueOf((String) argumentValue.getValue());
+                } else if ("int".equals(argumentValue.getType())) {
+                    paramTypes[i] = int.class;
+                    paramValues[i] = Integer.valueOf((String) argumentValue.getValue()).intValue();
+                } else {
+                    paramTypes[i] = String.class;
+                    paramValues[i] = argumentValue.getValue();
+                }
+            }
+            try {
+                // 获取构造函数
+                constructor = clz.getConstructor(paramTypes);
+                // 利用构造函数反射实例化Bean
+                obj = constructor.newInstance(paramValues);
+            } catch (NoSuchMethodException | InvocationTargetException | IllegalArgumentException | SecurityException e) {
+                e.printStackTrace();
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            try {
+                obj = clz.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        // 处理属性
+        PropertyValues propertyValues = beanDefinition.getPropertyValues();
+        if (!propertyValues.isEmpty()) {
+            // 遍历属性集合
+            for (int i = 0; i < propertyValues.size(); i++) {
+                PropertyValue propertyValue = propertyValues.getPropertyValueList().get(i);
+                String pName = propertyValue.getName();
+                String pType = propertyValue.getType();
+                Object pValue = propertyValue.getValue();
+
+                Class<?>[] paramTypes = new Class<?>[1];
+                if ("String".equals(pType) || "java.lang.String".equals(pType)) {
+                    paramTypes[0] = String.class;
+                } else if ("Integer".equals(pType) || "java.lang.Integer".equals(pType)) {
+                    paramTypes[0] = Integer.class;
+                } else if ("int".equals(pType)) {
+                    paramTypes[0] = int.class;
+                } else {
+                    paramTypes[0] = String.class;
+                }
+
+                Object[] paramValues = new Object[1];
+                paramValues[0] = pValue;
+
+                // 方法名字
+                String methodName = "set" + pName.substring(0, 1).toUpperCase() + pName.substring(1);
+
+                Method method = null;
+                try {
+                    // 获取到方法
+                    method = clz.getMethod(methodName, paramTypes);
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                } catch (SecurityException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    // 反射调用方法
+                    method.invoke(obj, paramValues);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+
+        return obj;
+    }
+
+
 
     @Override
     public Boolean containsBean(String name) {
