@@ -14,9 +14,9 @@ import me.xu.spring.exception.BeansException;
 public class DemoA {
     public static void main(String[] args) throws BeansException {
         ClassPathXmlApplicationContext classPathXmlApplicationContext = new ClassPathXmlApplicationContext("demo.xml");
-        AService aService = (AService)classPathXmlApplicationContext.getBean("AService");
-        aService.A();
+        //AService aService = (AService)classPathXmlApplicationContext.getBean("AService");
+        //aService.A();
         BService bService = (BService)classPathXmlApplicationContext.getBean("BService");
-        bService.B();
+        bService.userA();
     }
 }

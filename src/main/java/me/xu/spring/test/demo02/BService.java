@@ -9,4 +9,6 @@ package me.xu.spring.test.demo02;
  */
 public interface BService {
     void B();
+
+    void userA();
 }

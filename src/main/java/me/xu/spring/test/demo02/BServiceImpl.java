@@ -13,6 +13,8 @@ public class BServiceImpl implements BService{
 
     private int type;
 
+    private AService aService;
+
     public BServiceImpl(String content, int type) {
         this.content = content;
         this.type = type;
@@ -21,5 +23,14 @@ public class BServiceImpl implements BService{
     @Override
     public void B() {
         System.out.println(type + ":" + content);
+    }
+
+    @Override
+    public void userA() {
+        aService.A();
+    }
+
+    public void setAService(AServiceImpl aService) {
+        this.aService = aService;
     }
 }
