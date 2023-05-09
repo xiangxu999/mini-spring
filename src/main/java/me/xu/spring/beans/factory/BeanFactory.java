@@ -1,4 +1,4 @@
-package me.xu.spring.beans;
+package me.xu.spring.beans.factory;
 
 import me.xu.spring.exception.BeansException;
 

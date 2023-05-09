@@ -1,4 +1,4 @@
-package me.xu.spring.event;
+package me.xu.spring.context;
 
 /**
  * Description 事件发布

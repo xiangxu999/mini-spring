@@ -1,4 +1,4 @@
-package me.xu.spring.beans;
+package me.xu.spring.beans.factory.config;
 
 /**
  * Description Setter配置（单个）

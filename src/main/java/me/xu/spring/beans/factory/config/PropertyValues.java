@@ -1,4 +1,4 @@
-package me.xu.spring.beans;
+package me.xu.spring.beans.factory.config;
 
 import java.util.ArrayList;
 import java.util.List;

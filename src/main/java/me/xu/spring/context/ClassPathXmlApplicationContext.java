@@ -1,8 +1,8 @@
 package me.xu.spring.context;
 
-import me.xu.spring.beans.BeanFactory;
-import me.xu.spring.beans.SimpleBeanFactory;
-import me.xu.spring.beans.XmlBeanDefinitionReader;
+import me.xu.spring.beans.factory.BeanFactory;
+import me.xu.spring.beans.factory.support.SimpleBeanFactory;
+import me.xu.spring.beans.factory.xml.XmlBeanDefinitionReader;
 import me.xu.spring.core.ClassPathXmlResource;
 import me.xu.spring.core.Resource;
 import me.xu.spring.exception.BeansException;

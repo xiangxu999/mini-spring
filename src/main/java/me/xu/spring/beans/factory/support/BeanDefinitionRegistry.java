@@ -1,4 +1,6 @@
-package me.xu.spring.beans;
+package me.xu.spring.beans.factory.support;
+
+import me.xu.spring.beans.factory.config.BeanDefinition;
 
 /**
  * Description BeanDefinition操作接口

@@ -1,4 +1,4 @@
-package me.xu.spring.beans;
+package me.xu.spring.beans.factory.config;
 
 /**
  * Description Bean单例管理接口

@@ -1,4 +1,4 @@
-package me.xu.spring.event;
+package me.xu.spring.context;
 
 import java.util.EventObject;
 

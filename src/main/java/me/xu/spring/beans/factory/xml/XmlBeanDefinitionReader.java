@@ -1,5 +1,7 @@
-package me.xu.spring.beans;
+package me.xu.spring.beans.factory.xml;
 
+import me.xu.spring.beans.factory.config.*;
+import me.xu.spring.beans.factory.support.SimpleBeanFactory;
 import me.xu.spring.core.Resource;
 import org.dom4j.Element;
 
@@ -38,16 +40,16 @@ public class XmlBeanDefinitionReader {
 
             // 处理构造器参数
             List<Element> constrElements = element.elements("constructor-arg");
-            ArgumentValues argumentValues = new ArgumentValues();
+            ConstructorArgumentValues constructorArgumentValues = new ConstructorArgumentValues();
             for (Element e : constrElements) {
                 // 获取属性
                 String name = e.attributeValue("name");
                 String type = e.attributeValue("type");
                 String value = e.attributeValue("value");
                 // 添加到构造器参数集合中
-                argumentValues.addArgumentValue(new ArgumentValue(type, name, value));
+                constructorArgumentValues.addArgumentValue(new ConstructorArgumentValue(type, name, value));
             }
-            beanDefinition.setConstructorArgumentValues(argumentValues);
+            beanDefinition.setConstructorArgumentValues(constructorArgumentValues);
 
             // 处理属性
             List<Element> propertyElements = element.elements("property");

@@ -1,4 +1,4 @@
-package me.xu.spring.beans;
+package me.xu.spring.beans.factory.config;
 
 /**
  * Description 构造函数配置类
@@ -7,17 +7,17 @@ package me.xu.spring.beans;
  *
  * @author Wen
  */
-public class ArgumentValue {
+public class ConstructorArgumentValue {
     private Object value;
     private String type;
     private String name;
 
-    public ArgumentValue(String type, Object value) {
+    public ConstructorArgumentValue(String type, Object value) {
         this.value = value;
         this.type = type;
     }
 
-    public ArgumentValue(String type, String name, Object value) {
+    public ConstructorArgumentValue(String type, String name, Object value) {
         this.value = value;
         this.type = type;
         this.name = name;
