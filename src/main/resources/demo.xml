@@ -10,4 +10,6 @@
         <constructor-arg name="type"  type="int" value="1"/>
         <property name="aService" type="me.xu.spring.test.demo02.AServiceImpl" ref="AService"></property>
     </bean>
+    <bean id = "CService" class="me.xu.spring.test.demo03.CServiceImpl"/>
+    <bean id = "FService" class="me.xu.spring.test.demo03.FServiceImpl"/>
 </beans>
