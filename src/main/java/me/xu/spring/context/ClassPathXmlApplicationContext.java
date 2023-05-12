@@ -1,11 +1,17 @@
 package me.xu.spring.context;
 
 import me.xu.spring.beans.factory.BeanFactory;
-import me.xu.spring.beans.factory.support.SimpleBeanFactory;
+import me.xu.spring.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
+import me.xu.spring.beans.factory.config.BeanFactoryPostProcessor;
+import me.xu.spring.beans.factory.support.AutowireCapableBeanFactory;
 import me.xu.spring.beans.factory.xml.XmlBeanDefinitionReader;
 import me.xu.spring.core.ClassPathXmlResource;
 import me.xu.spring.core.Resource;
 import me.xu.spring.exception.BeansException;
+
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Description 解析XML构建上下文
@@ -16,7 +22,9 @@ import me.xu.spring.exception.BeansException;
  */
 public class ClassPathXmlApplicationContext implements BeanFactory {
 
-    SimpleBeanFactory simpleBeanFactory;
+    AutowireCapableBeanFactory beanFactory;
+
+    private final List<BeanFactoryPostProcessor> beanFactoryPostProcessors = new ArrayList<BeanFactoryPostProcessor>();
 
     public ClassPathXmlApplicationContext(String fileName) {
         this(fileName, false);
@@ -26,28 +34,53 @@ public class ClassPathXmlApplicationContext implements BeanFactory {
         // 获取资源
         Resource resource = new ClassPathXmlResource(fileName);
         // 解析资源
-        SimpleBeanFactory beanFactory = new SimpleBeanFactory();
+        //SimpleBeanFactory beanFactory = new SimpleBeanFactory();
+        // 创建处理注解的工厂对象
+        AutowireCapableBeanFactory beanFactory = new AutowireCapableBeanFactory();
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(beanFactory);
         reader.loadBeanDefinitions(resource);
-        this.simpleBeanFactory = beanFactory;
+        this.beanFactory = beanFactory;
         if (!isRefresh) {
-            beanFactory.refresh();
+            try {
+                refresh();
+            } catch (BeansException e) {
+                throw new RuntimeException(e);
+            }
         }
+    }
+
+    public void refresh() throws BeansException, IllegalStateException {
+        // 注册处理器
+        registerBeanPostProcessors(this.beanFactory);
+
+        // 初始化Bean容器
+        onRefresh();
+    }
+
+    private void onRefresh() {
+        this.beanFactory.refresh();
+    }
+
+    public List getBeanFactoryPostProcessors() { return this.beanFactoryPostProcessors; }
+    public void addBeanFactoryPostProcessor(BeanFactoryPostProcessor postProcessor) { this.beanFactoryPostProcessors.add(postProcessor); }
+
+    private void registerBeanPostProcessors(AutowireCapableBeanFactory beanFactory) {
+        beanFactory.addBeanPostProcessor(new AutowiredAnnotationBeanPostProcessor());
     }
 
     @Override
     public Object getBean(String beanName) throws BeansException {
-        return simpleBeanFactory.getBean(beanName);
+        return beanFactory.getBean(beanName);
     }
 
     @Override
     public Boolean containsBean(String name) {
-        return simpleBeanFactory.containsBean(name);
+        return beanFactory.containsBean(name);
     }
 
     @Override
     public void registerBean(String beanName, Object obj) {
-        simpleBeanFactory.registerBean(beanName, obj);
+        beanFactory.registerBean(beanName, obj);
     }
 
     @Override
