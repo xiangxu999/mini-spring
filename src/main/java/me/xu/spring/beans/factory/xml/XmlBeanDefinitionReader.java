@@ -1,7 +1,7 @@
 package me.xu.spring.beans.factory.xml;
 
 import me.xu.spring.beans.factory.config.*;
-import me.xu.spring.beans.factory.support.SimpleBeanFactory;
+import me.xu.spring.beans.factory.support.AutowireCapableBeanFactory;
 import me.xu.spring.core.Resource;
 import org.dom4j.Element;
 
@@ -17,13 +17,13 @@ import java.util.List;
  */
 public class XmlBeanDefinitionReader {
 
-    SimpleBeanFactory simpleBeanFactory;
+    AutowireCapableBeanFactory beanFactory;
 
     /**
      * 构造函数
      */
-    public XmlBeanDefinitionReader(SimpleBeanFactory simpleBeanFactory) {
-        this.simpleBeanFactory = simpleBeanFactory;
+    public XmlBeanDefinitionReader(AutowireCapableBeanFactory beanFactory) {
+        this.beanFactory = beanFactory;
     }
 
     /**
@@ -82,7 +82,7 @@ public class XmlBeanDefinitionReader {
             // 设置依赖集合
             beanDefinition.setDependsOn(refArray);
 
-            simpleBeanFactory.registerBeanDefinition(beanID, beanDefinition);
+            beanFactory.registerBeanDefinition(beanID, beanDefinition);
         }
     }
 
