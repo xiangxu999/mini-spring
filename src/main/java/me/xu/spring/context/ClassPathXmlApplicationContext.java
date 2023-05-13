@@ -2,8 +2,8 @@ package me.xu.spring.context;
 
 import me.xu.spring.beans.factory.BeanFactory;
 import me.xu.spring.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
+import me.xu.spring.beans.factory.config.AbstractAutowireCapableBeanFactory;
 import me.xu.spring.beans.factory.config.BeanFactoryPostProcessor;
-import me.xu.spring.beans.factory.support.AutowireCapableBeanFactory;
 import me.xu.spring.beans.factory.xml.XmlBeanDefinitionReader;
 import me.xu.spring.core.ClassPathXmlResource;
 import me.xu.spring.core.Resource;
@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class ClassPathXmlApplicationContext implements BeanFactory {
 
-    AutowireCapableBeanFactory beanFactory;
+    AbstractAutowireCapableBeanFactory beanFactory;
 
     private final List<BeanFactoryPostProcessor> beanFactoryPostProcessors = new ArrayList<BeanFactoryPostProcessor>();
 
@@ -36,7 +36,7 @@ public class ClassPathXmlApplicationContext implements BeanFactory {
         // 解析资源
         //SimpleBeanFactory beanFactory = new SimpleBeanFactory();
         // 创建处理注解的工厂对象
-        AutowireCapableBeanFactory beanFactory = new AutowireCapableBeanFactory();
+        AbstractAutowireCapableBeanFactory beanFactory = new AbstractAutowireCapableBeanFactory();
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(beanFactory);
         reader.loadBeanDefinitions(resource);
         this.beanFactory = beanFactory;
@@ -64,7 +64,7 @@ public class ClassPathXmlApplicationContext implements BeanFactory {
     public List getBeanFactoryPostProcessors() { return this.beanFactoryPostProcessors; }
     public void addBeanFactoryPostProcessor(BeanFactoryPostProcessor postProcessor) { this.beanFactoryPostProcessors.add(postProcessor); }
 
-    private void registerBeanPostProcessors(AutowireCapableBeanFactory beanFactory) {
+    private void registerBeanPostProcessors(AbstractAutowireCapableBeanFactory beanFactory) {
         beanFactory.addBeanPostProcessor(new AutowiredAnnotationBeanPostProcessor());
     }
 

@@ -1,5 +1,7 @@
 package me.xu.spring.beans.factory.config;
 
+import me.xu.spring.beans.factory.BeanFactory;
+
 /**
  * Description Bean处理器接口
  * Date 2023/5/9 9:50
@@ -26,5 +28,7 @@ public interface BeanPostProcessor {
      * @param beanName Bean id
      */
     Object postProcessAfterInitialization(Object bean, String beanName);
+
+    void setBeanFactory(BeanFactory beanFactory);
 
 }
